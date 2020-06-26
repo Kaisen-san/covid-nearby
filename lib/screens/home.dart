@@ -1,66 +1,114 @@
+import 'dart:convert';
+
+import 'package:covidnearby/models/covid_data.dart';
+import 'package:covidnearby/models/br_state.dart';
+import 'package:covidnearby/models/covid_request.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
+class HomeScreen extends StatelessWidget {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
-  Position _currentPosition;
-  String _currentAddress;
+  Future<Map<String, dynamic>> _initApp(BuildContext context) async {
+    List<BRState> states;
+    Placemark userLocation;
+    CovidData covidData;
 
-  Future<int> _initializeLocation() async {
-    _getCurrentLocation();
+    try {
+      String statesRawData = await DefaultAssetBundle.of(context).loadString('assets/data/br_states.json');
+      List<dynamic> statesParsedData = jsonDecode(statesRawData);
+      states = statesParsedData.map((json) => BRState.fromJson(json)).toList();
+
+      Position position = await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
+      List<Placemark> locations = await geolocator.placemarkFromCoordinates(position.latitude, position.longitude);
+      userLocation = locations[0];
+
+      BRState state = states.firstWhere((state) => state.name == userLocation.administrativeArea);
+      String county = state.counties.firstWhere((county) => county == userLocation.subAdministrativeArea);
+
+      covidData = await CovidRequest(state.abbreviation, county).getFullCases();
+
+      print(userLocation.toJson());
+      print(covidData.city);
+      print(covidData.date);
+    } catch (e) {
+      print(e);
+    }
+
+    return {
+      'states': states,
+      'userLocation': userLocation,
+      'covidData': covidData
+    };
   }
 
   @override
   Widget build(BuildContext context) {
+    List<BRState> states;
+    Placemark userLocation;
+    CovidData covidData;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Location"),
+        title: Text("Sua região"),
       ),
       body: FutureBuilder(
-        future: _initializeLocation(),
-        builder: (context, snapshot){
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                if (_currentPosition != null) Text(_currentAddress),
-                FlatButton(
-                  child: Text("Get location"),
-                  onPressed: () {
-                    _getCurrentLocation();
-                    print(_currentPosition);
-                    print(_currentAddress);
-                  },
-                ),
-              ],
-            ),
-          );
-        }
+        future: _initApp(context),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              break;
+            case ConnectionState.waiting:
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    CircularProgressIndicator(),
+                    SizedBox(height: 10,),
+                    Text('Carregando...'),
+                  ],
+                )
+              );
+              break;
+            case ConnectionState.active:
+              break;
+            case ConnectionState.done:
+              states = snapshot.data['states'];
+              userLocation = snapshot.data['userLocation'];
+              covidData = snapshot.data['covidData'];
+
+              if (states == null || userLocation == null || covidData == null) {
+                return Text('Não foi possível carregar as informações necessárias. Verifique sua conexão.');
+              }
+
+              return _homeBody(context);
+              break;
+          }
+
+          return Text('Erro desconhecido. Tente reiniciar o aplicativo.');
+        },
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           _homeFavoriteFAB(context),
-          SizedBox(
-            height: 10,
-          ),
-          _homeSearchFAB(context),
       ]),
       bottomNavigationBar: _homeBNB(context),
     );
   }
 
-  _homeSearchFAB(context) {
-    return FloatingActionButton(
-      onPressed: (){},
-      child: Icon(Icons.search),
+  _homeBody(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          FlatButton(
+            child: Text("Get location"),
+            onPressed: () {},
+          ),
+        ],
+      ),
     );
   }
 
@@ -69,14 +117,14 @@ class _HomeScreenState extends State<HomeScreen> {
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
-          title: Text("Home"),
+          title: Text("Início"),
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.star),
           title: Text("Favoritos"),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.map),
+          icon: Icon(Icons.search),
           title: Text("Pesquisar"),
         )
       ]
@@ -85,43 +133,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _homeFavoriteFAB(BuildContext context) {
     return FloatingActionButton(
-      onPressed: (){},
+      onPressed: () {},
       child: Icon(Icons.favorite),
     );
-  }
-
-
-  _getCurrentLocation() async {
-    geolocator
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
-        .then((Position position) {
-      setState(() {
-        _currentPosition = position;
-      });
-
-      _getAddressFromLatLng();
-    }).catchError((e) {
-      print(e);
-    });
-  }
-
-  _getAddressFromLatLng() async {
-    try {
-      List<Placemark> p = await geolocator.placemarkFromCoordinates(
-          _currentPosition.latitude, _currentPosition.longitude);
-
-      Placemark place = p[0];
-
-//      // País: print(place.country);
-//      // Estado: print(place.administrativeArea);
-//      // Cidade: print(place.subAdministrativeArea);
-
-      setState(() {
-        _currentAddress =
-        "${place.subAdministrativeArea}, ${place.administrativeArea}, ${place.country}";
-      });
-    } catch (e) {
-      print(e);
-    }
   }
 }
