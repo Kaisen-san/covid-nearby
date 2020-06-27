@@ -1,14 +1,16 @@
 import 'dart:convert';
 
 import 'package:covidnearby/components/card.dart';
+import 'package:covidnearby/components/graph.dart';
 import 'package:covidnearby/models/covid_data.dart';
 import 'package:covidnearby/models/brazil_data.dart';
 import 'package:covidnearby/models/br_state.dart';
 import 'package:covidnearby/models/covid_request.dart';
 import 'package:covidnearby/utils/network_helper.dart';
-import 'package:covidnearby/screens/common.dart';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+
 
 class HomeScreen extends StatelessWidget {
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
@@ -160,6 +162,12 @@ class HomeScreen extends StatelessWidget {
           fatais: "${brazilData.latestData.deaths} (+${brazilData.timeline[0].newDeaths})",
           mortalidade: "${brazilData.latestData.calculated.deathRate.toStringAsFixed(2)}%",
           titulo: "Brasil",
+        ),
+        SizedBox(height: 15,),
+        SizedBox(
+          width: 400,
+          height: 250,
+          child: CovidGraph(brazilData),
         ),
       ],
     );
