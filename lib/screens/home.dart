@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:covidnearby/models/covid_data.dart';
 import 'package:covidnearby/models/br_state.dart';
 import 'package:covidnearby/models/covid_request.dart';
+import 'package:covidnearby/screens/common.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -107,6 +108,22 @@ class HomeScreen extends StatelessWidget {
             child: Text("Get location"),
             onPressed: () {},
           ),
+          RaisedButton(
+            child: Text('Open route'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CommonScreen(
+                cidade_confirmados: "115.468 (+461)",
+                cidade_fatais: "864 (+69)",
+                cidade_mortalidade: "5,93%",
+                estado_confirmados: "31.423 (+1444)",
+                estado_fatais: "4124 (+545)",
+                estado_mortalidade: "3,32%"
+                )),
+              );
+            },
+          )
         ],
       ),
     );
