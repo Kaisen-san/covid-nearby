@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:covidnearby/screens/home.dart';
 
+import 'screens/home.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
