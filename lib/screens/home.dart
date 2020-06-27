@@ -1,16 +1,20 @@
 import 'dart:convert';
-
 import 'package:covidnearby/models/covid_data.dart';
 import 'package:covidnearby/models/br_state.dart';
+import 'package:covidnearby/models/covid_favorites.dart';
 import 'package:covidnearby/models/covid_request.dart';
 import 'package:covidnearby/screens/common.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:covidnearby/utils/db_helper.dart';
+
+
+int _currentIndex = 0;
 
 class HomeScreen extends StatelessWidget {
-  final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-
+  DatabaseHelper db = DatabaseHelper();
   Future<Map<String, dynamic>> _initApp(BuildContext context) async {
+    final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
     List<BRState> states;
     Placemark userLocation;
     CovidData covidData;
@@ -41,7 +45,11 @@ class HomeScreen extends StatelessWidget {
       'userLocation': userLocation,
       'covidData': covidData
     };
+
+    return null;
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -49,17 +57,22 @@ class HomeScreen extends StatelessWidget {
     Placemark userLocation;
     CovidData covidData;
 
+
+
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Sua região"),
       ),
+
       body: FutureBuilder(
         future: _initApp(context),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
               break;
-            case ConnectionState.waiting:
+           case ConnectionState.waiting:
+              print("ok");
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -68,16 +81,32 @@ class HomeScreen extends StatelessWidget {
                     CircularProgressIndicator(),
                     SizedBox(height: 10,),
                     Text('Carregando...'),
+
                   ],
                 )
+
               );
+
               break;
             case ConnectionState.active:
+              print("OK");
+              return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      SizedBox(height: 10,),
+                      Text("OK"),
+                    ],
+                  )
+              );
+
               break;
             case ConnectionState.done:
               states = snapshot.data['states'];
               userLocation = snapshot.data['userLocation'];
               covidData = snapshot.data['covidData'];
+
 
               if (states == null || userLocation == null || covidData == null) {
                 return Text('Não foi possível carregar as informações necessárias. Verifique sua conexão.');
@@ -95,7 +124,7 @@ class HomeScreen extends StatelessWidget {
         children: [
           _homeFavoriteFAB(context),
       ]),
-      bottomNavigationBar: _homeBNB(context),
+     // bottomNavigationBar: _homeBNB(context),
     );
   }
 
@@ -129,28 +158,13 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  _homeBNB(BuildContext context) {
-    return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          title: Text("Início"),
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.star),
-          title: Text("Favoritos"),
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.search),
-          title: Text("Pesquisar"),
-        )
-      ]
-    );
-  }
-
   _homeFavoriteFAB(BuildContext context) {
     return FloatingActionButton(
-      onPressed: () {},
+      onPressed: () {
+        //String State =
+        //Straing Province =
+        //db.addFavorite(State, Province);
+      },
       child: Icon(Icons.favorite),
     );
   }
