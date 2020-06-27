@@ -1,15 +1,6 @@
 import 'package:covidnearby/components/card.dart';
 import 'package:flutter/material.dart';
 
-//CommonScreen(
-//cidade_confirmados: "115.468 (+461)",
-//cidade_fatais: "864 (+69)",
-//cidade_mortalidade: "5,93%",
-//estado_confirmados: "31.423 (+1444)",
-//estado_fatais: "4124 (+545)",
-//estado_mortalidade: "3,32%"
-//)
-
 void main() => runApp(CommonScreen());
 
 class CommonScreen extends StatelessWidget {
