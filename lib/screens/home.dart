@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:covidnearby/models/covid_data.dart';
+import 'package:covidnearby/models/brazil_data.dart';
 import 'package:covidnearby/models/br_state.dart';
 import 'package:covidnearby/models/covid_request.dart';
+import 'package:covidnearby/utils/network_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -13,6 +15,7 @@ class HomeScreen extends StatelessWidget {
     List<BRState> states;
     Placemark userLocation;
     CovidData covidData;
+    BrazilData brazilData;
 
     try {
       String statesRawData = await DefaultAssetBundle.of(context).loadString('assets/data/br_states.json');
@@ -31,6 +34,19 @@ class HomeScreen extends StatelessWidget {
       print(userLocation.toJson());
       print(covidData.city);
       print(covidData.date);
+
+      NetworkHelper netHelper = NetworkHelper(url: 'https://corona-api.com/countries/BR');
+      brazilData = BrazilData.fromJson((await netHelper.getData())['data']);
+
+      print(brazilData.latestData.confirmed);
+      print(brazilData.latestData.recovered);
+      print(brazilData.latestData.deaths);
+
+      print(brazilData.timeline[0].date);
+      print(brazilData.timeline[1].date);
+      print(brazilData.timeline[2].date);
+      print(brazilData.timeline[3].date);
+
     } catch (e) {
       print(e);
     }
@@ -38,7 +54,8 @@ class HomeScreen extends StatelessWidget {
     return {
       'states': states,
       'userLocation': userLocation,
-      'covidData': covidData
+      'covidData': covidData,
+      'brazilData': brazilData
     };
   }
 
@@ -47,6 +64,7 @@ class HomeScreen extends StatelessWidget {
     List<BRState> states;
     Placemark userLocation;
     CovidData covidData;
+    BrazilData brazilData;
 
     return Scaffold(
       appBar: AppBar(
@@ -77,12 +95,13 @@ class HomeScreen extends StatelessWidget {
               states = snapshot.data['states'];
               userLocation = snapshot.data['userLocation'];
               covidData = snapshot.data['covidData'];
+              brazilData = snapshot.data['brazilData'];
 
               if (states == null || userLocation == null || covidData == null) {
                 return Text('Não foi possível carregar as informações necessárias. Verifique sua conexão.');
               }
 
-              return _homeBody(context);
+              return _homeBody(context, covidData, brazilData);
               break;
           }
 
@@ -98,17 +117,40 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  _homeBody(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          FlatButton(
-            child: Text("Get location"),
-            onPressed: () {},
+//  _homeBody(BuildContext context) {
+//    return Center(
+//      child: Column(
+//        mainAxisAlignment: MainAxisAlignment.center,
+//        children: <Widget>[
+//          FlatButton(
+//            child: Text("Get location"),
+//            onPressed: () {},
+//          ),
+//        ],
+//      ),
+//    );
+//  }
+
+  _homeBody(BuildContext context, CovidData covidData, BrazilData brazilData) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Card(
+          child: Container(
+            child: Column(
+              children: <Widget>[
+                Text("Brasil"),
+                Text("Confirmados: ${brazilData.latestData.confirmed} (+${brazilData.timeline[0].newConfirmed})"),
+                Text("Recuperados: ${brazilData.latestData.recovered} (+${brazilData.timeline[0].newRecovered})"),
+                Text("Mortes: ${brazilData.latestData.deaths} (+${brazilData.timeline[0].newDeaths})"),
+              ],
+            ),
+            width: 500,
+            height: 200,
           ),
-        ],
-      ),
+          //margin: 0.1,
+        ),
+      ]
     );
   }
 
