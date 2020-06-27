@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:covidnearby/components/card.dart';
 import 'package:covidnearby/components/graph.dart';
+import 'package:covidnearby/components/label.dart';
 import 'package:covidnearby/models/covid_data.dart';
 import 'package:covidnearby/models/brazil_data.dart';
 import 'package:covidnearby/models/br_state.dart';
@@ -164,10 +165,44 @@ class HomeScreen extends StatelessWidget {
           titulo: "Brasil",
         ),
         SizedBox(height: 15,),
+        Center(child: Text("Casos no Brasil")),
         SizedBox(
-          width: 400,
           height: 250,
           child: CovidGraph(brazilData),
+        ),
+        SizedBox(
+          height: 75,
+          child: Column(
+            children: [
+              SizedBox(height: 5),
+              Flexible(
+                flex: 1,
+                child: Row(
+                  children: <Widget>[
+                    Label("Confirmados", Colors.blue),
+                  ],
+                ),
+              ),
+              SizedBox(height: 5),
+              Flexible(
+                flex: 1,
+                child: Row(
+                  children: <Widget>[
+                    Label("Recuperados", Colors.green),
+                  ],
+                ),
+              ),
+              SizedBox(height: 5),
+              Flexible(
+                flex: 1,
+                child: Row(
+                  children: <Widget>[
+                    Label("Mortes", Colors.red),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
