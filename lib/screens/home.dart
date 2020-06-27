@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:covidnearby/components/card.dart';
 import 'package:covidnearby/models/covid_data.dart';
 import 'package:covidnearby/models/brazil_data.dart';
 import 'package:covidnearby/models/br_state.dart';
@@ -16,6 +17,7 @@ class HomeScreen extends StatelessWidget {
     List<BRState> states;
     Placemark userLocation;
     CovidData covidData;
+    CovidData stateData;
     BrazilData brazilData;
 
     try {
@@ -31,6 +33,7 @@ class HomeScreen extends StatelessWidget {
       String county = state.counties.firstWhere((county) => county == userLocation.subAdministrativeArea);
 
       covidData = await CovidRequest(state.abbreviation, county).getFullCases();
+      stateData = await CovidRequest(state.abbreviation, county).getStateCases();
 
       print(userLocation.toJson());
       print(covidData.city);
@@ -56,6 +59,7 @@ class HomeScreen extends StatelessWidget {
       'states': states,
       'userLocation': userLocation,
       'covidData': covidData,
+      'stateData': stateData,
       'brazilData': brazilData
     };
   }
@@ -65,6 +69,7 @@ class HomeScreen extends StatelessWidget {
     List<BRState> states;
     Placemark userLocation;
     CovidData covidData;
+    CovidData stateData;
     BrazilData brazilData;
 
     return Scaffold(
@@ -96,13 +101,14 @@ class HomeScreen extends StatelessWidget {
               states = snapshot.data['states'];
               userLocation = snapshot.data['userLocation'];
               covidData = snapshot.data['covidData'];
+              stateData = snapshot.data['stateData'];
               brazilData = snapshot.data['brazilData'];
 
               if (states == null || userLocation == null || covidData == null) {
                 return Text('Não foi possível carregar as informações necessárias. Verifique sua conexão.');
               }
 
-              return _homeBody(context, covidData, brazilData);
+              return _homeBody(context, covidData, stateData, brazilData);
               break;
           }
 
@@ -132,41 +138,30 @@ class HomeScreen extends StatelessWidget {
 //    );
 //  }
 
-  _homeBody(BuildContext context, CovidData covidData, BrazilData brazilData) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+  _homeBody(BuildContext context, CovidData covidData, CovidData stateData, BrazilData brazilData) {
+    return ListView(
       children: <Widget>[
-        Card(
-          child: Container(
-            child: Column(
-              children: <Widget>[
-                Text("Brasil"),
-                Text("Confirmados: ${brazilData.latestData.confirmed} (+${brazilData.timeline[0].newConfirmed})"),
-                Text("Recuperados: ${brazilData.latestData.recovered} (+${brazilData.timeline[0].newRecovered})"),
-                Text("Mortes: ${brazilData.latestData.deaths} (+${brazilData.timeline[0].newDeaths})"),
-              ],
-            ),
-            width: 500,
-            height: 200,
-          ),
-          RaisedButton(
-            child: Text('Open route'),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CommonScreen(
-                cidade_confirmados: "115.468 (+461)",
-                cidade_fatais: "864 (+69)",
-                cidade_mortalidade: "5,93%",
-                estado_confirmados: "31.423 (+1444)",
-                estado_fatais: "4124 (+545)",
-                estado_mortalidade: "3,32%"
-                )),
-              );
-            },
-          )
-        ],
-      ),
+        CardCovid(
+          confirmados: "${covidData.lastAvailableConfirmed} (+${covidData.newConfirmed})",
+          fatais: "${covidData.lastAvailableDeaths} (+${covidData.newDeaths})",
+          mortalidade: "${(covidData.lastAvailableDeathRate * 100).toStringAsFixed(2)}%",
+          titulo: covidData.city,
+        ),
+        SizedBox(height: 15,),
+        CardCovid(
+          confirmados: "${stateData.lastAvailableConfirmed} (+${stateData.newConfirmed})",
+          fatais: "${stateData.lastAvailableDeaths} (+${stateData.newDeaths})",
+          mortalidade: "${(stateData.lastAvailableDeathRate * 100).toStringAsFixed(2)}%",
+          titulo: stateData.state,
+        ),
+        SizedBox(height: 15,),
+        CardCovid(
+          confirmados: "${brazilData.latestData.confirmed} (+${brazilData.timeline[0].newConfirmed})",
+          fatais: "${brazilData.latestData.deaths} (+${brazilData.timeline[0].newDeaths})",
+          mortalidade: "${brazilData.latestData.calculated.deathRate.toStringAsFixed(2)}%",
+          titulo: "Brasil",
+        ),
+      ],
     );
   }
 

@@ -12,4 +12,10 @@ class CovidRequest {
 
     return CovidData.fromJson((await netHelper.getData())['results'][0]);
   }
+
+  Future<CovidData> getStateCases() async {
+    NetworkHelper netHelper = NetworkHelper(url: 'https://brasil.io/api/dataset/covid19/caso_full/data?state=${stateAbbreviation}&place_type=state&is_last=True');
+
+    return CovidData.fromJson((await netHelper.getData())['results'][0]);
+  }
 }
