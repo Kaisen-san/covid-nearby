@@ -90,7 +90,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   hintText: 'Buscar',
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                    borderRadius: BorderRadius.all(Radius.circular(24.0)),
                   ),
                 ),
               ),
@@ -131,7 +131,9 @@ class _SearchScreenState extends State<SearchScreen> {
                             city: stateCounty,
                           ),
                         ),
-                      ).then((value) => setState(() {}));
+                      ).then((value) => setState(() {
+                        filterSearchResults(editingController.text);
+                      }));
                     },
                   );
                 }
