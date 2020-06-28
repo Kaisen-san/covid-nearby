@@ -52,29 +52,18 @@ O aplicativo COVID Nearby é inspirado na iniciativa do buscador [Bing](https://
 
 ## Protótipo das telas do aplicativo
 
-**Principal e Favoritos**
-
-<img src="docs/images/proto-home-screen.png" width="400" alt="Protótipo da Tela Principal">
-<img src="docs/images/proto-favorites-screen.png" width="400" alt="Protótipo da Tela de Favoritos">
+![Protótipo da Tela Principal](docs/images/proto-home-screen.png) | ![Protótipo da Tela de Favoritos](docs/images/proto-favorites-screen.png)
+------------ | ------------
+Protótipo da Tela Principal | Protótipo da Tela de Favoritos
 
 ## Imagens das telas do aplicativo
 
-**Principal**
-
-<img src="docs/images/app-home-screen-1.jpg" width="400" alt="Tela Principal">
-<img src="docs/images/app-home-screen-2.jpg" width="400" alt="Tela Principal">
-
-**Favoritos**
-
-<img src="docs/images/app-favorites-screen-1.jpg" width="400" alt="Tela de Favoritos">
-<img src="docs/images/app-favorites-screen-2.jpg" width="400" alt="Tela de Favoritos">
-
-**Busca**
-
-<img src="docs/images/app-search-screen-1.jpg" width="400" alt="Tela de Busca">
-<img src="docs/images/app-search-screen-2.jpg" width="400" alt="Tela de Busca">
-
-**Detalhes**
-
-<img src="docs/images/app-details-screen-1.jpg" width="400" alt="Tela de Detalhes">
-<img src="docs/images/app-details-screen-2.jpg" width="400" alt="Tela de Detalhes">
+![Tela Principal](docs/images/app-home-screen-1.jpg) | ![Tela Principal](docs/images/app-home-screen-2.jpg)
+------------ | ------------
+Tela Principal | Tela Principal
+![Tela de Favoritos](docs/images/app-favorites-screen-1.jpg) | ![Tela de Favoritos](docs/images/app-favorites-screen-2.jpg)
+Tela de Favoritos | Tela de Favoritos
+![Tela de Busca](docs/images/app-search-screen-1.jpg) | ![Tela de Busca](docs/images/app-search-screen-2.jpg)
+Tela de Busca | Tela de Busca
+![Tela de Detalhes](docs/images/app-details-screen-1.jpg) | ![Tela de Detalhes](docs/images/app-details-screen-2.jpg)
+Tela de Detalhes | Tela de Detalhes
