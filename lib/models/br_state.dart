@@ -2,15 +2,15 @@ class BRState {
   String abbreviation;
   String name;
   BRRegion region;
-  List<String> counties;
+  List<String> cities;
 
-  BRState({this.abbreviation, this.name, this.region, this.counties});
+  BRState({ this.abbreviation, this.name, this.region, this.cities });
 
   BRState.fromJson(Map<String, dynamic> json) {
     abbreviation = json['sigla'];
     name = json['nome'];
     region = json['regiao'] != null ? new BRRegion.fromJson(json['regiao']) : null;
-    counties = json['municipios'].cast<String>();
+    cities = json['cidades'].cast<String>();
   }
 
   Map<String, dynamic> toJson() {
@@ -20,7 +20,7 @@ class BRState {
     if (this.region != null) {
       data['regiao'] = this.region.toJson();
     }
-    data['municipios'] = this.counties;
+    data['cidades'] = this.cities;
     return data;
   }
 }

@@ -1,157 +1,115 @@
-import 'dart:convert';
-
-import 'package:covidnearby/models/covid_data.dart';
-import 'package:covidnearby/models/br_state.dart';
-import 'package:covidnearby/models/covid_request.dart';
-import 'package:covidnearby/screens/common.dart';
+import 'package:covidnearby/components/covid_info.dart';
+import 'package:covidnearby/components/graph.dart';
+import 'package:covidnearby/components/graph_label.dart';
+import 'package:covidnearby/models/country_data.dart';
+import 'package:covidnearby/models/city_data.dart';
+import 'package:covidnearby/models/state_data.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 
 class HomeScreen extends StatelessWidget {
-  final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+  final CityData cityData;
+  final StateData stateData;
+  final CountryData countryData;
 
-  Future<Map<String, dynamic>> _initApp(BuildContext context) async {
-    List<BRState> states;
-    Placemark userLocation;
-    CovidData covidData;
-
-    try {
-      String statesRawData = await DefaultAssetBundle.of(context).loadString('assets/data/br_states.json');
-      List<dynamic> statesParsedData = jsonDecode(statesRawData);
-      states = statesParsedData.map((json) => BRState.fromJson(json)).toList();
-
-      Position position = await geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
-      List<Placemark> locations = await geolocator.placemarkFromCoordinates(position.latitude, position.longitude);
-      userLocation = locations[0];
-
-      BRState state = states.firstWhere((state) => state.name == userLocation.administrativeArea);
-      String county = state.counties.firstWhere((county) => county == userLocation.subAdministrativeArea);
-
-      covidData = await CovidRequest(state.abbreviation, county).getFullCases();
-
-      print(userLocation.toJson());
-      print(covidData.city);
-      print(covidData.date);
-    } catch (e) {
-      print(e);
-    }
-
-    return {
-      'states': states,
-      'userLocation': userLocation,
-      'covidData': covidData
-    };
-  }
+  HomeScreen({ Key key, this.cityData, this.stateData, this.countryData }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    List<BRState> states;
-    Placemark userLocation;
-    CovidData covidData;
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Sua região"),
-      ),
-      body: FutureBuilder(
-        future: _initApp(context),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              break;
-            case ConnectionState.waiting:
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    CircularProgressIndicator(),
-                    SizedBox(height: 10,),
-                    Text('Carregando...'),
-                  ],
-                )
-              );
-              break;
-            case ConnectionState.active:
-              break;
-            case ConnectionState.done:
-              states = snapshot.data['states'];
-              userLocation = snapshot.data['userLocation'];
-              covidData = snapshot.data['covidData'];
-
-              if (states == null || userLocation == null || covidData == null) {
-                return Text('Não foi possível carregar as informações necessárias. Verifique sua conexão.');
-              }
-
-              return _homeBody(context);
-              break;
-          }
-
-          return Text('Erro desconhecido. Tente reiniciar o aplicativo.');
-        },
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          _homeFavoriteFAB(context),
-      ]),
-      bottomNavigationBar: _homeBNB(context),
-    );
-  }
-
-  _homeBody(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: ListView(
         children: <Widget>[
-          FlatButton(
-            child: Text("Get location"),
-            onPressed: () {},
+          SizedBox(height: 16,),
+          Center(
+            child: Text("Casos no Brasil",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            )
           ),
-          RaisedButton(
-            child: Text('Open route'),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CommonScreen(
-                cidade_confirmados: "115.468 (+461)",
-                cidade_fatais: "864 (+69)",
-                cidade_mortalidade: "5,93%",
-                estado_confirmados: "31.423 (+1444)",
-                estado_fatais: "4124 (+545)",
-                estado_mortalidade: "3,32%"
-                )),
-              );
-            },
-          )
+          SizedBox(
+            height: 250,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 16.0),
+              child: CovidGraph(countryData),
+            ),
+          ),
+          SizedBox(
+            height: 75,
+            child: Column(
+              children: [
+                SizedBox(height: 5),
+                Flexible(
+                  flex: 1,
+                  child: Row(
+                    children: <Widget>[
+                      GraphLabel("Confirmados", Colors.blue),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 5),
+                Flexible(
+                  flex: 1,
+                  child: Row(
+                    children: <Widget>[
+                      GraphLabel("Recuperados", Colors.green),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 5),
+                Flexible(
+                  flex: 1,
+                  child: Row(
+                    children: <Widget>[
+                      GraphLabel("Mortes", Colors.red),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 16,),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: CovidInfo(
+              place: /*countryData.name*/ 'Brasil',
+              confirmed: countryData.latestData.confirmed,
+              recovered: countryData.latestData.recovered,
+              deaths: countryData.latestData.deaths,
+              deathRatePercent: countryData.latestData.calculated.deathRate,
+              newConfirmed: countryData.timeline[0].newConfirmed,
+              newRecovered: countryData.timeline[0].newRecovered,
+              newDeaths: countryData.timeline[0].newDeaths,
+            ),
+          ),
+          SizedBox(height: 16,),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: CovidInfo(
+              place: stateData.stateAbbreviation,
+              confirmed: stateData.lastAvailableConfirmed,
+              deaths: stateData.lastAvailableDeaths,
+              deathRatePercent: stateData.lastAvailableDeathRate * 100,
+              newConfirmed: stateData.newConfirmed,
+              newDeaths: stateData.newDeaths,
+            ),
+          ),
+          SizedBox(height: 16,),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: CovidInfo(
+              place: cityData.city,
+              confirmed: cityData.lastAvailableConfirmed,
+              deaths: cityData.lastAvailableDeaths,
+              deathRatePercent: cityData.lastAvailableDeathRate * 100,
+              newConfirmed: cityData.newConfirmed,
+              newDeaths: cityData.newDeaths,
+            ),
+          ),
+          SizedBox(height: 16,),
         ],
       ),
-    );
-  }
-
-  _homeBNB(BuildContext context) {
-    return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          title: Text("Início"),
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.star),
-          title: Text("Favoritos"),
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.search),
-          title: Text("Pesquisar"),
-        )
-      ]
-    );
-  }
-
-  _homeFavoriteFAB(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () {},
-      child: Icon(Icons.favorite),
     );
   }
 }
