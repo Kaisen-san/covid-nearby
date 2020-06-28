@@ -1,6 +1,6 @@
 # COVID Nearby
 
-> O aplicativo COVID Nearby mostra os casos de Covid-19 na sua região dentro do território brasileiro.
+> Visualizador da situação do COVID-19 nos estados e cidades do Brasil.
 
 ## Objetivo
 
@@ -29,7 +29,7 @@ O aplicativo COVID Nearby é inspirado na iniciativa do buscador [Bing](https://
 ]
 ```
 
-## Estrutura do projeto
+## Roadmap do projeto
 
 ### Milestones - v1
 
@@ -50,10 +50,31 @@ O aplicativo COVID Nearby é inspirado na iniciativa do buscador [Bing](https://
   - Incluir na tela principal gráficos da evolução do número de casos
   - Incluir um mapa mostrando a localização atual do usuário ou a região selecionada
 
-
-### Design das telas
+## Protótipo das telas do aplicativo
 
 **Principal e Favoritos**
 
-![Tela Principal](home-screen.png?raw=true "Tela Principal")
-![Tela Favoritos](favorites-screen.png?raw=true "Tela Favoritos")
+<img src="docs/images/proto-home-screen.png" width="400" alt="Protótipo da Tela Principal">
+<img src="docs/images/proto-favorites-screen.png" width="400" alt="Protótipo da Tela de Favoritos">
+
+## Imagens das telas do aplicativo
+
+**Principal**
+
+<img src="docs/images/app-home-screen-1.jpg" width="400" alt="Tela Principal">
+<img src="docs/images/app-home-screen-2.jpg" width="400" alt="Tela Principal">
+
+**Favoritos**
+
+<img src="docs/images/app-favorites-screen-1.jpg" width="400" alt="Tela de Favoritos">
+<img src="docs/images/app-favorites-screen-2.jpg" width="400" alt="Tela de Favoritos">
+
+**Busca**
+
+<img src="docs/images/app-search-screen-1.jpg" width="400" alt="Tela de Busca">
+<img src="docs/images/app-search-screen-2.jpg" width="400" alt="Tela de Busca">
+
+**Detalhes**
+
+<img src="docs/images/app-details-screen-1.jpg" width="400" alt="Tela de Detalhes">
+<img src="docs/images/app-details-screen-2.jpg" width="400" alt="Tela de Detalhes">
